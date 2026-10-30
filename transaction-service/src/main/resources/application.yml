@@ -48,6 +48,10 @@ spring:
         type: SYNC
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
   endpoints:
     web:
       exposure:

@@ -22,6 +22,10 @@ spring:
         spring.json.trusted.packages: ma.adria.bank.notification.model
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
   endpoints:
     web:
       exposure:

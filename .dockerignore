@@ -1,0 +1,10 @@
+**/target/
+.git/
+.github/
+.idea/
+**/.venv/
+**/node_modules/
+**/dist/
+**/__pycache__/
+docs/
+*.md

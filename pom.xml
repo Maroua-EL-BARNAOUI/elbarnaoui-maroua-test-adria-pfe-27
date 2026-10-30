@@ -25,6 +25,7 @@
         <module>account-service</module>
         <module>transaction-service</module>
         <module>notification-consumer</module>
+        <module>assistant-service</module>
         <module>gateway-service</module>
     </modules>
 

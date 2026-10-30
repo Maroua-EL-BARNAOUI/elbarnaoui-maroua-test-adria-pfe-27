@@ -1,0 +1,34 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: assistant-service
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          # Aucune clé d'API : le LLM tourne en local. Changer de modèle via OLLAMA_MODEL.
+          model: ${OLLAMA_MODEL:llama3.2:3b}
+          temperature: 0.1
+    mcp:
+      client:
+        type: SYNC
+        request-timeout: 30s
+        sse:
+          connections:
+            account-service:
+              url: ${ACCOUNT_SERVICE_URL:http://localhost:8081}
+            transaction-service:
+              url: ${TRANSACTION_SERVICE_URL:http://localhost:8082}
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info

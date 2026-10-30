@@ -1,0 +1,77 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/bank
+
+jobs:
+  # 1. Compilation + 2. tests
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Compilation et tests (Java)
+        run: mvn -B verify
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pipeline de détection de fraude (Python)
+        working-directory: fraud-detection
+        run: |
+          pip install -r requirements.txt
+          python fraud_detection.py
+
+  # 3. Construction des images + 4. publication dans le registre (GHCR)
+  publish-images:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        module: [config-service, discovery-service, account-service, transaction-service,
+                 notification-consumer, gateway-service]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          build-args: MODULE=${{ matrix.module }}
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.module }}:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.module }}:latest
+          cache-from: type=gha,scope=${{ matrix.module }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.module }}
+
+  # 5. Déploiement (schématique : aucun cloud réel n'est demandé)
+  deploy:
+    needs: publish-images
+    runs-on: ubuntu-latest
+    environment: staging        # approbation manuelle configurable sur l'environnement
+    steps:
+      - uses: actions/checkout@v4
+      - name: Déploiement sur l'hôte de staging
+        run: |
+          echo "Exemple : copie de docker-compose.yml puis, sur l'hôte :"
+          echo "  IMAGE_TAG=${{ github.sha }} docker compose pull"
+          echo "  IMAGE_TAG=${{ github.sha }} docker compose up -d --wait"
+          # ssh deploy@staging "cd /opt/bank && IMAGE_TAG=${{ github.sha }} docker compose up -d --wait"
