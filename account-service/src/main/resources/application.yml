@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: account-service
+  datasource:
+    url: jdbc:h2:mem:accountdb;DB_CLOSE_DELAY=-1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  graphql:
+    graphiql:
+      enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+  ai:
+    mcp:
+      server:
+        name: account-service
+        version: 1.0.0
+        type: SYNC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+bank:
+  demo-data: true

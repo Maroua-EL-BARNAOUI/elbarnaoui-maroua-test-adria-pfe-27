@@ -5,7 +5,7 @@ Chaque partie est développée, testée, puis enregistrée séparément sur GitH
 | # | Partie | Contenu (réf. cahier des charges) | Statut |
 |---|---|---|---|
 | 1 | Fondations et conception | A (projet Maven parent, .gitignore, README), B (diagrammes) | Terminé |
-| 2 | account-service | C.1 : domain/repository/service, REST, GraphQL, MCP, tests | À faire |
+| 2 | account-service | C.1 : domain/repository/service, REST, GraphQL, MCP, tests | Terminé |
 | 3 | transaction-service | C.2 et C.3 : règles métier, virement, OpenFeign, Resilience4j, tests | À faire |
 | 4 | Services techniques | D : config-service (`bank.transaction.max-amount=1000`), Eureka, Gateway | À faire |
 | 5 | Kafka | F : producer `bank.transactions.created` (clé = accountId), consumer qui journalise | À faire |

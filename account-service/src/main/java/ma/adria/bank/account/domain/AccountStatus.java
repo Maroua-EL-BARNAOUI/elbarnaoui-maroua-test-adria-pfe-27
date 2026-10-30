@@ -1,0 +1,6 @@
+package ma.adria.bank.account.domain;
+
+public enum AccountStatus {
+    ACTIVE,
+    BLOCKED
+}
