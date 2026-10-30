@@ -1,0 +1,50 @@
+scalar BigDecimal
+
+enum TransactionType {
+    DEBIT
+    CREDIT
+}
+
+type Transaction {
+    id: ID!
+    accountId: ID!
+    amount: BigDecimal!
+    currency: String!
+    merchantCategory: String!
+    country: String!
+    createdAt: String!
+    type: TransactionType!
+    transferId: ID
+}
+
+type TransferResult {
+    transferId: ID!
+    debit: Transaction!
+    credit: Transaction!
+}
+
+input RegisterTransactionInput {
+    accountId: ID!
+    amount: BigDecimal!
+    currency: String!
+    merchantCategory: String!
+    country: String!
+}
+
+input TransferInput {
+    fromAccountId: ID!
+    toAccountId: ID!
+    amount: BigDecimal!
+    currency: String!
+    country: String
+}
+
+type Query {
+    transactionById(id: ID!): Transaction
+    transactionsByAccount(accountId: ID!): [Transaction!]!
+}
+
+type Mutation {
+    registerTransaction(input: RegisterTransactionInput!): Transaction!
+    transfer(input: TransferInput!): TransferResult!
+}

@@ -189,5 +189,8 @@ Un virement est un enchaînement débit du compte source / crédit du compte des
 | Socle | Java 21, Spring Boot 3.5, Spring Cloud 2025.0, Spring AI 1.0 | Versions alignées avec les technologies imposées |
 | Persistance | H2 (fichier/mémoire) | Épreuve de 3 h : pas de dépendance d'infrastructure supplémentaire |
 | Montant | `BigDecimal` pour les transactions, `double` pour le solde | Respect du modèle minimal imposé |
+| Transaction | Modèle minimal + `type` (DEBIT/CREDIT) et `transferId` | Distinguer les deux jambes d'un virement sans changer le format de l'évènement Kafka |
+| Résilience | Circuit breaker sur tous les appels vers account-service, retry sur la lecture seulement | Rejouer une mise à jour de solde pourrait débiter deux fois ; pas de solde fabriqué en fallback, erreur 503 explicite |
+| Cohérence virement | Débit puis crédit, compensation du débit si le crédit échoue | Pas de transaction distribuée entre deux services |
 | Sécurité | Keycloak (OIDC), services en resource server JWT | Authentification centralisée, autorisations par rôle |
 | LLM | Ollama en local (configurable) | Pas de clé API à stocker dans le dépôt |

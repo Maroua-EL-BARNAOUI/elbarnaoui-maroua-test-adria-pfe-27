@@ -21,6 +21,7 @@
     <!-- Les modules sont ajoutes au fil des parties du projet (voir docs/PLAN.md). -->
     <modules>
         <module>account-service</module>
+        <module>transaction-service</module>
     </modules>
 
     <properties>

@@ -1,0 +1,71 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: transaction-service
+  datasource:
+    url: jdbc:h2:mem:transactiondb;DB_CLOSE_DELAY=-1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  graphql:
+    graphiql:
+      enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 3000
+  ai:
+    mcp:
+      server:
+        name: transaction-service
+        version: 1.0.0
+        type: SYNC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,circuitbreakers,retries
+  health:
+    circuitbreakers:
+      enabled: true
+
+bank:
+  transaction:
+    # Sera fourni par le config-service (partie D)
+    max-amount: 1000
+  clients:
+    account-service:
+      url: http://localhost:8081
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      account-service:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        register-health-indicator: true
+        ignore-exceptions:
+          - ma.adria.bank.transaction.domain.ResourceNotFoundException
+          - ma.adria.bank.transaction.domain.BusinessRuleException
+  retry:
+    instances:
+      account-service:
+        max-attempts: 3
+        wait-duration: 200ms
+        ignore-exceptions:
+          - ma.adria.bank.transaction.domain.ResourceNotFoundException
+          - ma.adria.bank.transaction.domain.BusinessRuleException
+          - io.github.resilience4j.circuitbreaker.CallNotPermittedException
