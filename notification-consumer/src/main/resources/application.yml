@@ -1,0 +1,28 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: notification-consumer
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: notification-consumer
+      # Un nouveau groupe relit les évènements déjà publiés
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # Un message illisible est journalisé puis ignoré au lieu de bloquer la partition
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        # Détecte vite un topic créé ou agrandi après le démarrage du consumer (5 min par défaut)
+        metadata.max.age.ms: 5000
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: ma.adria.bank.notification.model.TransactionCreatedEvent
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: ma.adria.bank.notification.model
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

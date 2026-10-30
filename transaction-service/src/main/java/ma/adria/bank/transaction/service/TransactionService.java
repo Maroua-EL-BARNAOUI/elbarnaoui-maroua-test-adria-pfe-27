@@ -8,9 +8,11 @@ import ma.adria.bank.transaction.domain.BusinessRuleException;
 import ma.adria.bank.transaction.domain.ResourceNotFoundException;
 import ma.adria.bank.transaction.domain.Transaction;
 import ma.adria.bank.transaction.domain.TransactionType;
+import ma.adria.bank.transaction.messaging.TransactionRegistered;
 import ma.adria.bank.transaction.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,13 +35,16 @@ public class TransactionService {
     private final AccountGateway accounts;
     private final BankTransactionProperties properties;
     private final Clock clock;
+    private final ApplicationEventPublisher events;
 
     public TransactionService(TransactionRepository repository, AccountGateway accounts,
-                              BankTransactionProperties properties, Clock clock) {
+                              BankTransactionProperties properties, Clock clock,
+                              ApplicationEventPublisher events) {
         this.repository = repository;
         this.accounts = accounts;
         this.properties = properties;
         this.clock = clock;
+        this.events = events;
     }
 
     /**
@@ -61,6 +66,7 @@ public class TransactionService {
         Transaction transaction = repository.save(newTransaction(
                 accountId, amount, currency, category, country, TransactionType.DEBIT, null));
         accounts.applyBalanceDelta(accountId, -amount.doubleValue());
+        events.publishEvent(new TransactionRegistered(transaction));
         return transaction;
     }
 
@@ -99,6 +105,8 @@ public class TransactionService {
             compensateDebit(from, amount, transferId);
             throw failure;
         }
+        events.publishEvent(new TransactionRegistered(debit));
+        events.publishEvent(new TransactionRegistered(credit));
         return new TransferResult(transferId, debit, credit);
     }
 

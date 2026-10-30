@@ -27,6 +27,19 @@ spring:
           default:
             connect-timeout: 2000
             read-timeout: 3000
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # Le JSON est produit par TransactionEventPublisher (pas d'en-tête de type Java)
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        # Kafka indisponible : échouer vite plutôt que bloquer la requête HTTP
+        max.block.ms: 3000
+        delivery.timeout.ms: 10000
+        request.timeout.ms: 5000
   ai:
     mcp:
       server:
