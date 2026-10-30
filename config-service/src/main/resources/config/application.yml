@@ -1,0 +1,4 @@
+# Configuration partagée par tous les micro-services (cahier des charges, partie D.3)
+bank:
+  transaction:
+    max-amount: 1000

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.UUID;
 
 /**
- * Client OpenFeign vers account-service. L'URL est configurable ; elle désignera le nom
- * logique du service lorsque la découverte Eureka sera en place.
+ * Client OpenFeign vers account-service. Sans URL, le nom « account-service » est résolu
+ * et équilibré via Eureka ; une URL explicite (bank.clients.account-service.url) la remplace.
  */
-@FeignClient(name = "account-service", url = "${bank.clients.account-service.url}")
+@FeignClient(name = "account-service", url = "${bank.clients.account-service.url:}")
 public interface AccountClient {
 
     @GetMapping("/api/accounts/{id}")

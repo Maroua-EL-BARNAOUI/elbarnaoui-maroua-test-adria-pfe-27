@@ -20,8 +20,11 @@
 
     <!-- Les modules sont ajoutes au fil des parties du projet (voir docs/PLAN.md). -->
     <modules>
+        <module>config-service</module>
+        <module>discovery-service</module>
         <module>account-service</module>
         <module>transaction-service</module>
+        <module>gateway-service</module>
     </modules>
 
     <properties>

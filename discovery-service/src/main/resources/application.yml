@@ -1,0 +1,22 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-service
+
+eureka:
+  client:
+    # Serveur autonome : il ne s'enregistre pas auprès de lui-même
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    # Évite les messages d'attente au démarrage d'un serveur unique
+    wait-time-in-ms-when-sync-empty: 0
+    enable-self-preservation: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
